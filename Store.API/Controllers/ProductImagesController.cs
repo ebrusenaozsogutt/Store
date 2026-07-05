@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Store.Application.DTOs.ProductImage;
 using Store.Application.Services.Abstract;
 
@@ -15,7 +16,7 @@ namespace Store.API.Controllers
             _productImageService = productImageService;
         }
 
-        // Tüm görselleri getir
+        // Tum gorselleri getir
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -23,28 +24,30 @@ namespace Store.API.Controllers
             return Ok(images);
         }
 
-        // Id'ye göre görsel getir
+        // Id'ye gore gorsel getir
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
             var image = await _productImageService.GetByIdAsync(id);
 
             if (image == null)
-                return NotFound("Görsel bulunamadı.");
+                return NotFound("Gorsel bulunamadi.");
 
             return Ok(image);
         }
 
-        // Yeni görsel ekle
+        // Yeni gorsel ekle
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Add(CreateProductImageDto dto)
         {
             await _productImageService.AddAsync(dto);
 
-            return Ok("Görsel başarıyla eklendi.");
+            return Ok("Gorsel basariyla eklendi.");
         }
 
-        // Görsel güncelle
+        // Gorsel guncelle
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, UpdateProductImageDto dto)
         {
@@ -52,16 +55,17 @@ namespace Store.API.Controllers
 
             await _productImageService.UpdateAsync(dto);
 
-            return Ok("Görsel başarıyla güncellendi.");
+            return Ok("Gorsel basariyla guncellendi.");
         }
 
-        // Görsel sil
+        // Gorsel sil
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             await _productImageService.DeleteAsync(id);
 
-            return Ok("Görsel başarıyla silindi.");
+            return Ok("Gorsel basariyla silindi.");
         }
     }
 }

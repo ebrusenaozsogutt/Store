@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Store.Application.DTOs.Order;
 using Store.Application.Services.Abstract;
 
@@ -15,7 +15,7 @@ namespace Store.API.Controllers
             _orderService = orderService;
         }
 
-        // Tüm siparişleri getir
+        // Tum siparisleri getir
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -23,28 +23,36 @@ namespace Store.API.Controllers
             return Ok(orders);
         }
 
-        // Id'ye göre sipariş getir
+        // Toplam ciroyu getir
+        [HttpGet("revenue")]
+        public async Task<IActionResult> GetRevenue()
+        {
+            var revenue = await _orderService.GetTotalRevenueAsync();
+            return Ok(revenue);
+        }
+
+        // Id'ye gore siparis getir
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
             var order = await _orderService.GetByIdAsync(id);
 
             if (order == null)
-                return NotFound("Sipariş bulunamadı.");
+                return NotFound("Siparis bulunamadi.");
 
             return Ok(order);
         }
 
-        // Yeni sipariş ekle
+        // Yeni siparis ekle
         [HttpPost]
         public async Task<IActionResult> Add(CreateOrderDto dto)
         {
             await _orderService.AddAsync(dto);
 
-            return Ok("Sipariş başarıyla oluşturuldu.");
+            return Ok("Siparis basariyla olusturuldu.");
         }
 
-        // Sipariş güncelle
+        // Siparis guncelle
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, UpdateOrderDto dto)
         {
@@ -52,16 +60,16 @@ namespace Store.API.Controllers
 
             await _orderService.UpdateAsync(dto);
 
-            return Ok("Sipariş başarıyla güncellendi.");
+            return Ok("Siparis basariyla guncellendi.");
         }
 
-        // Sipariş sil
+        // Siparis sil
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             await _orderService.DeleteAsync(id);
 
-            return Ok("Sipariş başarıyla silindi.");
+            return Ok("Siparis basariyla silindi.");
         }
     }
 }

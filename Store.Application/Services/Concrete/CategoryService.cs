@@ -1,4 +1,4 @@
-﻿using Store.Application.DTOs.Category;
+using Store.Application.DTOs.Category;
 using Store.Application.Interfaces.Repositories;
 using Store.Application.Services.Abstract;
 using Store.Domain.Entities;
@@ -14,7 +14,7 @@ namespace Store.Application.Services.Concrete
             _categoryRepository = categoryRepository;
         }
 
-        // Tüm kategorileri DTO olarak getir
+        // Tum kategorileri DTO olarak getir
         public async Task<List<CategoryDto>> GetAllAsync()
         {
             var categories = await _categoryRepository.GetAllAsync();
@@ -27,7 +27,7 @@ namespace Store.Application.Services.Concrete
             }).ToList();
         }
 
-        // Id'ye göre kategori getir
+        // Id'ye gore kategori getir
         public async Task<CategoryDto?> GetByIdAsync(int id)
         {
             var category = await _categoryRepository.GetByIdAsync(id);
@@ -46,9 +46,11 @@ namespace Store.Application.Services.Concrete
         // Yeni kategori ekle
         public async Task AddAsync(CreateCategoryDto dto)
         {
+            ValidateCategoryName(dto.Name);
+
             var category = new Category
             {
-                Name = dto.Name,
+                Name = dto.Name.Trim(),
                 ParentCategoryId = dto.ParentCategoryId
             };
 
@@ -56,15 +58,17 @@ namespace Store.Application.Services.Concrete
             await _categoryRepository.SaveChangesAsync();
         }
 
-        // Güncelle
+        // Guncelle
         public async Task UpdateAsync(UpdateCategoryDto dto)
         {
+            ValidateCategoryName(dto.Name);
+
             var category = await _categoryRepository.GetByIdAsync(dto.Id);
 
             if (category == null)
                 return;
 
-            category.Name = dto.Name;
+            category.Name = dto.Name.Trim();
             category.ParentCategoryId = dto.ParentCategoryId;
 
             _categoryRepository.Update(category);
@@ -81,6 +85,12 @@ namespace Store.Application.Services.Concrete
 
             _categoryRepository.Delete(category);
             await _categoryRepository.SaveChangesAsync();
+        }
+
+        private static void ValidateCategoryName(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentException("Kategori adi bos olamaz.");
         }
     }
 }

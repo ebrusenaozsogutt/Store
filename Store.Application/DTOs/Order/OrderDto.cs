@@ -1,4 +1,4 @@
-﻿namespace Store.Application.DTOs.Order
+namespace Store.Application.DTOs.Order
 {
     public class OrderDto
     {
@@ -6,7 +6,7 @@
 
         public int ProductId { get; set; }
 
-        public int UserId { get; set; }
+        public int? UserId { get; set; }
 
         public int Quantity { get; set; }
 

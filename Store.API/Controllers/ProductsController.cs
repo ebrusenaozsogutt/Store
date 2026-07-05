@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Store.Application.DTOs.Product;
 using Store.Application.Services.Abstract;
 
@@ -15,7 +15,7 @@ namespace Store.API.Controllers
             _productService = productService;
         }
 
-        // Tüm ürünleri getir
+        // Tum urunleri getir
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -23,28 +23,28 @@ namespace Store.API.Controllers
             return Ok(products);
         }
 
-        // Id'ye göre ürün getir
+        // Id'ye gore urun getir
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
             var product = await _productService.GetByIdAsync(id);
 
             if (product == null)
-                return NotFound("Ürün bulunamadı.");
+                return NotFound("Urun bulunamadi.");
 
             return Ok(product);
         }
 
-        // Yeni ürün ekle
+        // Yeni urun ekle
         [HttpPost]
         public async Task<IActionResult> Add(CreateProductDto dto)
         {
             await _productService.AddAsync(dto);
 
-            return Ok("Ürün başarıyla eklendi.");
+            return Ok("Urun basariyla eklendi.");
         }
 
-        // Ürün güncelle
+        // Urun guncelle
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, UpdateProductDto dto)
         {
@@ -52,16 +52,16 @@ namespace Store.API.Controllers
 
             await _productService.UpdateAsync(dto);
 
-            return Ok("Ürün başarıyla güncellendi.");
+            return Ok("Urun basariyla guncellendi.");
         }
 
-        // Ürün sil
+        // Urun sil
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             await _productService.DeleteAsync(id);
 
-            return Ok("Ürün başarıyla silindi.");
+            return Ok("Urun basariyla silindi.");
         }
     }
 }

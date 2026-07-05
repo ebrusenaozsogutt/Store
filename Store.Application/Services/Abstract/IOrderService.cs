@@ -1,4 +1,4 @@
-﻿using Store.Application.DTOs.Order;
+using Store.Application.DTOs.Order;
 
 namespace Store.Application.Services.Abstract
 {
@@ -7,6 +7,8 @@ namespace Store.Application.Services.Abstract
         Task<List<OrderDto>> GetAllAsync();
 
         Task<OrderDto?> GetByIdAsync(int id);
+
+        Task<decimal> GetTotalRevenueAsync();
 
         Task AddAsync(CreateOrderDto dto);
 

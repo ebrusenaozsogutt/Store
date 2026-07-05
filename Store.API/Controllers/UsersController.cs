@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Store.Application.DTOs.User;
 using Store.Application.Services.Abstract;
 
@@ -15,7 +15,7 @@ namespace Store.API.Controllers
             _userService = userService;
         }
 
-        // Tüm kullanıcıları getir
+        // Tum kullanicilari getir
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -23,28 +23,28 @@ namespace Store.API.Controllers
             return Ok(users);
         }
 
-        // Id'ye göre kullanıcı getir
+        // Id'ye gore kullanici getir
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
             var user = await _userService.GetByIdAsync(id);
 
             if (user == null)
-                return NotFound("Kullanıcı bulunamadı.");
+                return NotFound("Kullanici bulunamadi.");
 
             return Ok(user);
         }
 
-        // Yeni kullanıcı ekle
+        // Yeni kullanici ekle
         [HttpPost]
         public async Task<IActionResult> Add(CreateUserDto dto)
         {
             await _userService.AddAsync(dto);
 
-            return Ok("Kullanıcı başarıyla eklendi.");
+            return Ok("Kullanici basariyla eklendi.");
         }
 
-        // Kullanıcı güncelle
+        // Kullanici guncelle
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, UpdateUserDto dto)
         {
@@ -52,16 +52,16 @@ namespace Store.API.Controllers
 
             await _userService.UpdateAsync(dto);
 
-            return Ok("Kullanıcı başarıyla güncellendi.");
+            return Ok("Kullanici basariyla guncellendi.");
         }
 
-        // Kullanıcı sil
+        // Kullanici sil
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             await _userService.DeleteAsync(id);
 
-            return Ok("Kullanıcı başarıyla silindi.");
+            return Ok("Kullanici basariyla silindi.");
         }
     }
 }

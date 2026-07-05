@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Store.Application.DTOs.Category;
 using Store.Application.Services.Abstract;
 
@@ -15,7 +15,7 @@ namespace Store.API.Controllers
             _categoryService = categoryService;
         }
 
-        // Tüm kategorileri getir
+        // Tum kategorileri getir
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -23,14 +23,14 @@ namespace Store.API.Controllers
             return Ok(categories);
         }
 
-        // Id'ye göre kategori getir
+        // Id'ye gore kategori getir
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
             var category = await _categoryService.GetByIdAsync(id);
 
             if (category == null)
-                return NotFound("Kategori bulunamadı.");
+                return NotFound("Kategori bulunamadi.");
 
             return Ok(category);
         }
@@ -41,10 +41,10 @@ namespace Store.API.Controllers
         {
             await _categoryService.AddAsync(dto);
 
-            return Ok("Kategori başarıyla eklendi.");
+            return Ok("Kategori basariyla eklendi.");
         }
 
-        // Kategori güncelle
+        // Kategori guncelle
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, UpdateCategoryDto dto)
         {
@@ -52,7 +52,7 @@ namespace Store.API.Controllers
 
             await _categoryService.UpdateAsync(dto);
 
-            return Ok("Kategori başarıyla güncellendi.");
+            return Ok("Kategori basariyla guncellendi.");
         }
 
         // Kategori sil
@@ -61,7 +61,7 @@ namespace Store.API.Controllers
         {
             await _categoryService.DeleteAsync(id);
 
-            return Ok("Kategori başarıyla silindi.");
+            return Ok("Kategori basariyla silindi.");
         }
     }
 }

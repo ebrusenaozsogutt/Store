@@ -1,4 +1,4 @@
-﻿using Store.Application.DTOs.Order;
+using Store.Application.DTOs.Order;
 using Store.Application.Interfaces.Repositories;
 using Store.Application.Services.Abstract;
 using Store.Domain.Entities;
@@ -8,13 +8,15 @@ namespace Store.Application.Services.Concrete
     public class OrderService : IOrderService
     {
         private readonly IOrderRepository _orderRepository;
+        private readonly IProductRepository _productRepository;
 
-        public OrderService(IOrderRepository orderRepository)
+        public OrderService(IOrderRepository orderRepository, IProductRepository productRepository)
         {
             _orderRepository = orderRepository;
+            _productRepository = productRepository;
         }
 
-        // Tüm siparişleri getir
+        // Tum siparisleri getir
         public async Task<List<OrderDto>> GetAllAsync()
         {
             var orders = await _orderRepository.GetAllAsync();
@@ -34,7 +36,7 @@ namespace Store.Application.Services.Concrete
             }).ToList();
         }
 
-        // Id'ye göre sipariş getir
+        // Id'ye gore siparis getir
         public async Task<OrderDto?> GetByIdAsync(int id)
         {
             var order = await _orderRepository.GetByIdAsync(id);
@@ -57,39 +59,87 @@ namespace Store.Application.Services.Concrete
             };
         }
 
-        // Sipariş ekle
+        public async Task<decimal> GetTotalRevenueAsync()
+        {
+            var orders = await _orderRepository.GetAllAsync();
+            return orders.Sum(x => x.TotalPrice);
+        }
+
+        // Siparis ekle
         public async Task AddAsync(CreateOrderDto dto)
         {
+            ValidateQuantity(dto.Quantity);
+
+            var product = await _productRepository.GetByIdAsync(dto.ProductId);
+
+            if (product == null)
+                throw new InvalidOperationException("Urun bulunamadi.");
+
+            EnsureEnoughStock(product, dto.Quantity);
+
+            var unitPrice = GetUnitPrice(product);
+            var totalPrice = unitPrice * dto.Quantity;
+
+            product.StockQuantity -= dto.Quantity;
+
             var order = new Order
             {
                 ProductId = dto.ProductId,
-                UserId = dto.UserId,
+                UserId = null,
                 Quantity = dto.Quantity,
-                UnitPrice = dto.UnitPrice,
-                TotalPrice = dto.Quantity * dto.UnitPrice,
+                UnitPrice = unitPrice,
+                TotalPrice = totalPrice,
                 CustomerName = dto.CustomerName,
                 CustomerPhone = dto.CustomerPhone,
                 CustomerAddress = dto.CustomerAddress,
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTime.UtcNow
             };
 
             await _orderRepository.AddAsync(order);
             await _orderRepository.SaveChangesAsync();
         }
 
-        // Sipariş güncelle
+        // Siparis guncelle
         public async Task UpdateAsync(UpdateOrderDto dto)
         {
             var order = await _orderRepository.GetByIdAsync(dto.Id);
 
             if (order == null)
-                return;
+                throw new InvalidOperationException("Siparis bulunamadi.");
+
+            ValidateQuantity(dto.Quantity);
+
+            var previousProduct = await _productRepository.GetByIdAsync(order.ProductId);
+
+            if (previousProduct == null)
+                throw new InvalidOperationException("Mevcut siparise ait urun bulunamadi.");
+
+            previousProduct.StockQuantity += order.Quantity;
+
+            Product targetProduct;
+
+            if (order.ProductId == dto.ProductId)
+            {
+                targetProduct = previousProduct;
+            }
+            else
+            {
+                targetProduct = await _productRepository.GetByIdAsync(dto.ProductId)
+                    ?? throw new InvalidOperationException("Urun bulunamadi.");
+            }
+
+            EnsureEnoughStock(targetProduct, dto.Quantity);
+
+            var unitPrice = GetUnitPrice(targetProduct);
+            var totalPrice = unitPrice * dto.Quantity;
+
+            targetProduct.StockQuantity -= dto.Quantity;
 
             order.ProductId = dto.ProductId;
             order.UserId = dto.UserId;
             order.Quantity = dto.Quantity;
-            order.UnitPrice = dto.UnitPrice;
-            order.TotalPrice = dto.Quantity * dto.UnitPrice;
+            order.UnitPrice = unitPrice;
+            order.TotalPrice = totalPrice;
             order.CustomerName = dto.CustomerName;
             order.CustomerPhone = dto.CustomerPhone;
             order.CustomerAddress = dto.CustomerAddress;
@@ -98,7 +148,7 @@ namespace Store.Application.Services.Concrete
             await _orderRepository.SaveChangesAsync();
         }
 
-        // Sipariş sil
+        // Siparis sil
         public async Task DeleteAsync(int id)
         {
             var order = await _orderRepository.GetByIdAsync(id);
@@ -108,6 +158,23 @@ namespace Store.Application.Services.Concrete
 
             _orderRepository.Delete(order);
             await _orderRepository.SaveChangesAsync();
+        }
+
+        private static void ValidateQuantity(int quantity)
+        {
+            if (quantity <= 0)
+                throw new ArgumentException("Siparis adedi 0'dan buyuk olmalidir.");
+        }
+
+        private static void EnsureEnoughStock(Product product, int quantity)
+        {
+            if (product.StockQuantity < quantity)
+                throw new InvalidOperationException("Urun stogu siparis adedini karsilamiyor.");
+        }
+
+        private static decimal GetUnitPrice(Product product)
+        {
+            return product.DiscountPrice ?? product.Price;
         }
     }
 }

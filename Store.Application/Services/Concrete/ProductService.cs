@@ -1,4 +1,4 @@
-﻿using Store.Application.DTOs.Product;
+using Store.Application.DTOs.Product;
 using Store.Application.Interfaces.Repositories;
 using Store.Application.Services.Abstract;
 using Store.Domain.Entities;
@@ -14,7 +14,7 @@ namespace Store.Application.Services.Concrete
             _productRepository = productRepository;
         }
 
-        // Tüm ürünleri getir
+        // Tum urunleri getir
         public async Task<List<ProductDto>> GetAllAsync()
         {
             var products = await _productRepository.GetAllAsync();
@@ -32,7 +32,7 @@ namespace Store.Application.Services.Concrete
             }).ToList();
         }
 
-        // Id'ye göre ürün getir
+        // Id'ye gore urun getir
         public async Task<ProductDto?> GetByIdAsync(int id)
         {
             var product = await _productRepository.GetByIdAsync(id);
@@ -53,33 +53,37 @@ namespace Store.Application.Services.Concrete
             };
         }
 
-        // Ürün ekle
+        // Urun ekle
         public async Task AddAsync(CreateProductDto dto)
         {
+            ValidateProduct(dto.Title, dto.Price, dto.DiscountPrice, dto.StockQuantity);
+
             var product = new Product
             {
-                Title = dto.Title,
+                Title = dto.Title.Trim(),
                 Description = dto.Description,
                 Price = dto.Price,
                 DiscountPrice = dto.DiscountPrice,
                 StockQuantity = dto.StockQuantity,
                 CategoryId = dto.CategoryId,
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTime.UtcNow
             };
 
             await _productRepository.AddAsync(product);
             await _productRepository.SaveChangesAsync();
         }
 
-        // Ürün güncelle
+        // Urun guncelle
         public async Task UpdateAsync(UpdateProductDto dto)
         {
+            ValidateProduct(dto.Title, dto.Price, dto.DiscountPrice, dto.StockQuantity);
+
             var product = await _productRepository.GetByIdAsync(dto.Id);
 
             if (product == null)
                 return;
 
-            product.Title = dto.Title;
+            product.Title = dto.Title.Trim();
             product.Description = dto.Description;
             product.Price = dto.Price;
             product.DiscountPrice = dto.DiscountPrice;
@@ -90,7 +94,7 @@ namespace Store.Application.Services.Concrete
             await _productRepository.SaveChangesAsync();
         }
 
-        // Ürün sil
+        // Urun sil
         public async Task DeleteAsync(int id)
         {
             var product = await _productRepository.GetByIdAsync(id);
@@ -100,6 +104,21 @@ namespace Store.Application.Services.Concrete
 
             _productRepository.Delete(product);
             await _productRepository.SaveChangesAsync();
+        }
+
+        private static void ValidateProduct(string title, decimal price, decimal? discountPrice, int stockQuantity)
+        {
+            if (string.IsNullOrWhiteSpace(title))
+                throw new ArgumentException("Urun basligi bos olamaz.");
+
+            if (price <= 0)
+                throw new ArgumentException("Urun fiyati 0'dan buyuk olmalidir.");
+
+            if (discountPrice.HasValue && discountPrice.Value >= price)
+                throw new ArgumentException("Indirimli fiyat normal fiyattan kucuk olmalidir.");
+
+            if (stockQuantity < 0)
+                throw new ArgumentException("Stok miktari negatif olamaz.");
         }
     }
 }

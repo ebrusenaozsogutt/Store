@@ -77,7 +77,7 @@ namespace Store.Infrastructure.Migrations
                     b.Property<decimal>("UnitPrice")
                         .HasColumnType("numeric");
 
-                    b.Property<int>("UserId")
+                    b.Property<int?>("UserId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
@@ -188,14 +188,13 @@ namespace Store.Infrastructure.Migrations
                     b.HasOne("Store.Domain.Entities.Product", "Product")
                         .WithMany("Orders")
                         .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Store.Domain.Entities.User", "User")
                         .WithMany("Orders")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Product");
 
