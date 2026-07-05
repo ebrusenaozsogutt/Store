@@ -30,19 +30,19 @@ function AdminOrders() {
         const response = await api.get('/Orders')
         setOrders(response.data || [])
         setError('')
-    } catch (requestError) {
-      console.error('Admin orders request failed:', requestError)
-      setError(getAdminErrorMessage(requestError, 'Siparişler getirilemedi.'))
-    } finally {
-      setLoading(false)
-    }
+      } catch (requestError) {
+        console.error('Admin orders request failed:', requestError)
+        setError(getAdminErrorMessage(requestError, 'Siparişler getirilemedi.'))
+      } finally {
+        setLoading(false)
+      }
     }
 
     loadOrders()
   }, [])
 
   return (
-    <div className="page-section">
+    <div className="page-section admin-page admin-orders-page">
       <div className="admin-panel-header">
         <div>
           <h1 className="page-title">Admin Siparişler</h1>

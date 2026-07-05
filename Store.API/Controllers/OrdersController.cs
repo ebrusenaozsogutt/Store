@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Store.Application.DTOs.Order;
 using Store.Application.Services.Abstract;
@@ -16,6 +17,7 @@ namespace Store.API.Controllers
         }
 
         // Tum siparisleri getir
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -24,6 +26,7 @@ namespace Store.API.Controllers
         }
 
         // Toplam ciroyu getir
+        [Authorize(Roles = "Admin")]
         [HttpGet("revenue")]
         public async Task<IActionResult> GetRevenue()
         {
@@ -32,6 +35,7 @@ namespace Store.API.Controllers
         }
 
         // Id'ye gore siparis getir
+        [Authorize(Roles = "Admin")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -53,6 +57,7 @@ namespace Store.API.Controllers
         }
 
         // Siparis guncelle
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, UpdateOrderDto dto)
         {
@@ -64,6 +69,7 @@ namespace Store.API.Controllers
         }
 
         // Siparis sil
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {

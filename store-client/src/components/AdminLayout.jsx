@@ -12,15 +12,17 @@ function AdminLayout() {
   return (
     <div className="admin-shell">
       <aside className="admin-sidebar">
-        <div className="admin-brand">
-          <span className="eyebrow">Admin Panel</span>
-          <h2 style={{ margin: 0 }}>Store Yönetimi</h2>
-          <p style={{ margin: 0, color: 'rgba(255,255,255,0.72)' }}>
-            Ürün, kategori, sipariş ve kullanıcı işlemlerini yönetin.
-          </p>
+        <div className="admin-sidebar-top">
+          <div className="admin-brand">
+            <span className="eyebrow">Admin Panel</span>
+            <h2 className="admin-brand-title">Store Yönetimi</h2>
+            <p className="admin-brand-text">
+              Ürün, kategori, sipariş ve kullanıcı işlemlerini tek merkezden yönetin.
+            </p>
+          </div>
         </div>
 
-        <nav>
+        <nav className="admin-sidebar-nav">
           <NavLink className="admin-link" end to="/admin">
             Gösterge Paneli
           </NavLink>
@@ -41,13 +43,17 @@ function AdminLayout() {
           </NavLink>
         </nav>
 
-        <button className="button-secondary" type="button" onClick={handleLogout}>
-          Çıkış Yap
-        </button>
+        <div className="admin-sidebar-footer">
+          <button className="button-secondary admin-logout-button" type="button" onClick={handleLogout}>
+            Çıkış Yap
+          </button>
+        </div>
       </aside>
 
       <section className="admin-content">
-        <Outlet />
+        <div className="admin-page-container">
+          <Outlet />
+        </div>
       </section>
     </div>
   )

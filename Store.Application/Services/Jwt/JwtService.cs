@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using Store.Domain.Enums;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -21,12 +22,13 @@ namespace Store.Application.Services.Jwt
             var issuer = GetRequiredJwtSetting("Issuer");
             var audience = GetRequiredJwtSetting("Audience");
             var expireMinutes = GetExpireMinutes();
+            var normalizedRole = NormalizeRole(role);
 
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
                 new Claim(ClaimTypes.Email, email),
-                new Claim(ClaimTypes.Role, role)
+                new Claim(ClaimTypes.Role, normalizedRole)
             };
 
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
@@ -64,6 +66,23 @@ namespace Store.Application.Services.Jwt
                 return 60;
 
             return expireMinutes;
+        }
+
+        private static string NormalizeRole(string role)
+        {
+            if (string.IsNullOrWhiteSpace(role))
+                return UserRole.Customer.ToString();
+
+            if (int.TryParse(role, out var numericRole))
+            {
+                return numericRole == (int)UserRole.Admin
+                    ? UserRole.Admin.ToString()
+                    : UserRole.Customer.ToString();
+            }
+
+            return role.Equals(UserRole.Admin.ToString(), StringComparison.OrdinalIgnoreCase)
+                ? UserRole.Admin.ToString()
+                : UserRole.Customer.ToString();
         }
     }
 }

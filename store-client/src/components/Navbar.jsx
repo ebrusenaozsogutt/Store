@@ -1,12 +1,16 @@
 import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { isAdminRole } from '../utils/auth'
 
 function Navbar() {
   const navigate = useNavigate()
   const token = localStorage.getItem('token')
+  const role = localStorage.getItem('role')
+  const canAccessAdmin = Boolean(token) && isAdminRole(role)
 
   const handleLogout = () => {
     localStorage.removeItem('token')
     localStorage.removeItem('role')
+    localStorage.removeItem('email')
     navigate('/')
   }
 
@@ -25,7 +29,7 @@ function Navbar() {
           <NavLink className="nav-link" to="/products">
             Ürünler
           </NavLink>
-          {token && (
+          {canAccessAdmin && (
             <NavLink className="nav-link" to="/admin">
               Admin Panel
             </NavLink>

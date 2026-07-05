@@ -1,4 +1,4 @@
-﻿using Store.Application.DTOs.User;
+using Store.Application.DTOs.User;
 using Store.Application.Interfaces.Repositories;
 using Store.Application.Services.Abstract;
 using Store.Domain.Entities;
@@ -56,8 +56,8 @@ namespace Store.Application.Services.Concrete
                 FullName = dto.FullName,
                 Email = dto.Email,
                 PasswordHash = dto.PasswordHash,
-                Role = Enum.Parse<UserRole>(dto.Role),
-                CreatedAt = DateTime.Now
+                Role = ParseRole(dto.Role),
+                CreatedAt = DateTime.UtcNow
             };
 
             await _userRepository.AddAsync(user);
@@ -75,7 +75,21 @@ namespace Store.Application.Services.Concrete
             user.FullName = dto.FullName;
             user.Email = dto.Email;
             user.PasswordHash = dto.PasswordHash;
-            user.Role = Enum.Parse<UserRole>(dto.Role);
+            user.Role = ParseRole(dto.Role);
+
+            _userRepository.Update(user);
+            await _userRepository.SaveChangesAsync();
+        }
+
+        // Kullanıcı rolü güncelle
+        public async Task UpdateRoleAsync(int id, UpdateUserRoleDto dto)
+        {
+            var user = await _userRepository.GetByIdAsync(id);
+
+            if (user == null)
+                throw new KeyNotFoundException("Kullanici bulunamadi.");
+
+            user.Role = ParseRole(dto.Role);
 
             _userRepository.Update(user);
             await _userRepository.SaveChangesAsync();
@@ -91,6 +105,20 @@ namespace Store.Application.Services.Concrete
 
             _userRepository.Delete(user);
             await _userRepository.SaveChangesAsync();
+        }
+
+        private static UserRole ParseRole(string role)
+        {
+            if (string.IsNullOrWhiteSpace(role))
+                throw new ArgumentException("Rol bos olamaz.");
+
+            if (role.Equals(UserRole.Admin.ToString(), StringComparison.OrdinalIgnoreCase))
+                return UserRole.Admin;
+
+            if (role.Equals(UserRole.Customer.ToString(), StringComparison.OrdinalIgnoreCase))
+                return UserRole.Customer;
+
+            throw new ArgumentException("Rol sadece Admin veya Customer olabilir.");
         }
     }
 }

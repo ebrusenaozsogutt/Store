@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Store.Application.DTOs.User;
 using Store.Application.Services.Abstract;
@@ -16,6 +17,7 @@ namespace Store.API.Controllers
         }
 
         // Tum kullanicilari getir
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -24,6 +26,7 @@ namespace Store.API.Controllers
         }
 
         // Id'ye gore kullanici getir
+        [Authorize(Roles = "Admin")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -36,6 +39,7 @@ namespace Store.API.Controllers
         }
 
         // Yeni kullanici ekle
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Add(CreateUserDto dto)
         {
@@ -45,6 +49,7 @@ namespace Store.API.Controllers
         }
 
         // Kullanici guncelle
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, UpdateUserDto dto)
         {
@@ -55,7 +60,28 @@ namespace Store.API.Controllers
             return Ok("Kullanici basariyla guncellendi.");
         }
 
+        // Kullanici rolunu guncelle
+        [Authorize(Roles = "Admin")]
+        [HttpPut("{id}/role")]
+        public async Task<IActionResult> UpdateRole(int id, UpdateUserRoleDto dto)
+        {
+            try
+            {
+                await _userService.UpdateRoleAsync(id, dto);
+                return Ok("Kullanici rolu guncellendi.");
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
         // Kullanici sil
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {

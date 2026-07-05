@@ -81,7 +81,7 @@ function Dashboard() {
   }, [])
 
   return (
-    <div className="page-section">
+    <div className="page-section admin-page dashboard-page">
       <div className="admin-panel-header">
         <div>
           <h1 className="page-title">Gösterge Paneli</h1>
@@ -95,20 +95,20 @@ function Dashboard() {
       ) : error ? (
         <div className="loading">Dashboard verileri şu anda gösterilemiyor.</div>
       ) : (
-        <div className="stats-grid">
-          <article className="stat-card">
+        <div className="stats-grid dashboard-stats-grid">
+          <article className="stat-card dashboard-stat-card">
             <span className="stat-label">Toplam Gelir</span>
             <strong className="stat-value">{formatCurrency(stats.revenue)}</strong>
           </article>
-          <article className="stat-card">
+          <article className="stat-card dashboard-stat-card">
             <span className="stat-label">Toplam Ürün</span>
             <strong className="stat-value">{stats.productCount}</strong>
           </article>
-          <article className="stat-card">
+          <article className="stat-card dashboard-stat-card">
             <span className="stat-label">Toplam Sipariş</span>
             <strong className="stat-value">{stats.orderCount}</strong>
           </article>
-          <article className="stat-card">
+          <article className="stat-card dashboard-stat-card">
             <span className="stat-label">Toplam Kullanıcı</span>
             <strong className="stat-value">{stats.userCount}</strong>
           </article>

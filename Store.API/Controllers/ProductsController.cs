@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Store.Application.DTOs.Product;
 using Store.Application.Services.Abstract;
@@ -36,6 +37,7 @@ namespace Store.API.Controllers
         }
 
         // Yeni urun ekle
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Add(CreateProductDto dto)
         {
@@ -45,6 +47,7 @@ namespace Store.API.Controllers
         }
 
         // Urun guncelle
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, UpdateProductDto dto)
         {
@@ -56,6 +59,7 @@ namespace Store.API.Controllers
         }
 
         // Urun sil
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {

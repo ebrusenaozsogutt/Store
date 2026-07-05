@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { BrowserRouter, Navigate, Outlet, Route, Routes, useLocation } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import AdminLayout from './components/AdminLayout'
+import ProtectedAdminRoute from './components/ProtectedAdminRoute'
 import Home from './pages/Home'
 import Products from './pages/Products'
 import ProductDetail from './pages/ProductDetail'
@@ -49,12 +50,14 @@ function AppRouter() {
           <Route path="/login" element={<Login />} />
         </Route>
 
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<Dashboard />} />
-          <Route path="products" element={<AdminProducts />} />
-          <Route path="categories" element={<AdminCategories />} />
-          <Route path="orders" element={<AdminOrders />} />
-          <Route path="users" element={<AdminUsers />} />
+        <Route element={<ProtectedAdminRoute />}>
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<Dashboard />} />
+            <Route path="products" element={<AdminProducts />} />
+            <Route path="categories" element={<AdminCategories />} />
+            <Route path="orders" element={<AdminOrders />} />
+            <Route path="users" element={<AdminUsers />} />
+          </Route>
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />

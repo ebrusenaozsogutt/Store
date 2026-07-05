@@ -84,18 +84,23 @@ function AdminCategories() {
   }
 
   return (
-    <div className="page-section">
+    <div className="page-section admin-page admin-categories-page">
       <div className="admin-panel-header">
         <div>
           <h1 className="page-title">Admin Kategoriler</h1>
-          <p className="section-subtitle">Kategori ekle, parent ID ver veya sil.</p>
+          <p className="section-subtitle">Kategori ekle, üst kategori ID ver veya sil.</p>
         </div>
       </div>
 
       {error && <div className="notice error">{error}</div>}
       {successMessage && <div className="notice success">{successMessage}</div>}
 
-      <form className="form-panel" onSubmit={handleSubmit}>
+      <form className="form-panel admin-form-card compact-form" onSubmit={handleSubmit}>
+        <div className="admin-form-head">
+          <h2 className="section-title">Kategori Ekle</h2>
+          <p className="muted-text">Daha kompakt düzenle yeni kategori oluşturun.</p>
+        </div>
+
         <div className="two-column">
           <div className="field">
             <label htmlFor="name">Ad</label>
@@ -114,9 +119,11 @@ function AdminCategories() {
           </div>
         </div>
 
-        <button className="button" disabled={submitting} type="submit">
-          {submitting ? 'Ekleniyor...' : 'Kategori Ekle'}
-        </button>
+        <div className="admin-actions-row">
+          <button className="button" disabled={submitting} type="submit">
+            {submitting ? 'Ekleniyor...' : 'Kategori Ekle'}
+          </button>
+        </div>
       </form>
 
       <div className="table-panel">

@@ -1,7 +1,7 @@
-﻿namespace Store.Domain.Enums;
+namespace Store.Domain.Enums;
 
 public enum UserRole
 {
-    Admin,
-    Customer
+    Customer = 0,
+    Admin = 1
 }

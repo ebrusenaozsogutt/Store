@@ -56,14 +56,15 @@ namespace Store.Application.Services.Concrete
             if (!passwordCorrect)
                 return null;
 
-            var token = _jwtService.GenerateToken(user.Id, user.Email, user.Role.ToString());
+            var roleName = user.Role.ToString();
+            var token = _jwtService.GenerateToken(user.Id, user.Email, roleName);
 
             return new LoginResponseDto
             {
                 Token = token,
                 FullName = user.FullName,
                 Email = user.Email,
-                Role = user.Role.ToString()
+                Role = roleName
             };
         }
 

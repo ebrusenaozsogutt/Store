@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import api from '../api/axios'
 
+const PRODUCT_PLACEHOLDER_URL = 'https://placehold.co/400x300?text=%C3%9Cr%C3%BCn+G%C3%B6rseli'
+
 function formatCurrency(value) {
   return new Intl.NumberFormat('tr-TR', {
     style: 'currency',
@@ -10,10 +12,17 @@ function formatCurrency(value) {
   }).format(value ?? 0)
 }
 
+function findProductImage(productImages) {
+  const coverImage = productImages.find((image) => image.isCover)
+  return coverImage || productImages[0] || null
+}
+
 function ProductDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
   const [product, setProduct] = useState(null)
+  const [productImages, setProductImages] = useState([])
+  const [selectedImageUrl, setSelectedImageUrl] = useState(PRODUCT_PLACEHOLDER_URL)
   const [quantity, setQuantity] = useState(1)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -21,9 +30,21 @@ function ProductDetail() {
   useEffect(() => {
     const loadProduct = async () => {
       try {
-        const response = await api.get(`/Products/${id}`)
-        setProduct(response.data)
+        const [productResponse, productImagesResponse] = await Promise.all([
+          api.get(`/Products/${id}`),
+          api.get('/ProductImages'),
+        ])
+
+        const nextProduct = productResponse.data
+        const allImages = productImagesResponse.data || []
+        const relatedImages = allImages.filter((image) => Number(image.productId) === Number(id))
+        const selectedImage = findProductImage(relatedImages)
+
+        setProduct(nextProduct)
+        setProductImages(relatedImages)
+        setSelectedImageUrl(selectedImage?.imageUrl || PRODUCT_PLACEHOLDER_URL)
       } catch (requestError) {
+        console.error('Product detail request failed:', requestError)
         setError('Ürün detayı getirilemedi.')
       } finally {
         setLoading(false)
@@ -51,6 +72,40 @@ function ProductDetail() {
   return (
     <div className="product-detail-layout">
       <section className="product-detail">
+        <div className="product-detail-media">
+          <img
+            className="product-main-image"
+            src={selectedImageUrl}
+            alt={`${product.title} görseli`}
+            onError={(event) => {
+              event.currentTarget.src = PRODUCT_PLACEHOLDER_URL
+            }}
+          />
+
+          {productImages.length > 0 ? (
+            <div className="product-gallery">
+              {productImages.map((image) => (
+                <button
+                  key={image.id}
+                  className={`gallery-thumb${selectedImageUrl === image.imageUrl ? ' active' : ''}`}
+                  type="button"
+                  onClick={() => setSelectedImageUrl(image.imageUrl || PRODUCT_PLACEHOLDER_URL)}
+                >
+                  <img
+                    src={image.imageUrl || PRODUCT_PLACEHOLDER_URL}
+                    alt={`${product.title} küçük görseli`}
+                    onError={(event) => {
+                      event.currentTarget.src = PRODUCT_PLACEHOLDER_URL
+                    }}
+                  />
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div className="muted-text">Ürün görseli bulunamadı.</div>
+          )}
+        </div>
+
         <span className="eyebrow">Ürün Detayı</span>
         <h1 className="page-title">{product.title}</h1>
         <p className="muted-text">{product.description || 'Bu ürün için açıklama eklenmemiş.'}</p>
@@ -64,7 +119,6 @@ function ProductDetail() {
           <span className={product.stockQuantity > 0 ? 'pill success' : 'pill warning'}>
             Stok: {product.stockQuantity}
           </span>
-          <span className="pill">Kategori ID: {product.categoryId}</span>
         </div>
 
         <div className="quantity-box">

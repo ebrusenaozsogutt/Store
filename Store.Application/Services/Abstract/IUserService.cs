@@ -1,4 +1,4 @@
-﻿using Store.Application.DTOs.User;
+using Store.Application.DTOs.User;
 
 namespace Store.Application.Services.Abstract
 {
@@ -11,6 +11,8 @@ namespace Store.Application.Services.Abstract
         Task AddAsync(CreateUserDto dto);
 
         Task UpdateAsync(UpdateUserDto dto);
+
+        Task UpdateRoleAsync(int id, UpdateUserRoleDto dto);
 
         Task DeleteAsync(int id);
     }
